@@ -172,11 +172,22 @@ def decode():
             filename_result = "No se encontro el nombre del archivo"
         
     print("Imagen decodificada exitosamente.")
+    result_directory = os.getcwd() + "/results/"
+    if not os.path.exists(os.path.dirname(result_directory)):
+        try:
+            os.makedirs(os.path.dirname(result_directory))
+        except OSError as exc: # Guard against race condition
+            if exc.errno != errno.EEXIST:
+                raise
+    print(result_directory)
     if save_file_name:
-        print(filename_result)
-        m_file = open(filename_result, "w", encoding='utf8')
+        file_path = result_directory + filename_result
+        print(file_path)
+        m_file = open(file_path, "w", encoding='utf8')
     else:
-        m_file = open("result", "w", encoding='utf8')
+        file_path = result_directory + filename_result
+        print(file_path)
+        m_file = open(file_path, "w", encoding='utf8')
     m_file.write(result)
     m_file.close()
     d_message_label = Label(decode_frame, text="Imagen decodificada exitosamente.", bg='SpringGreen2', font=("Times New Roman", 16))
