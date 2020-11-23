@@ -196,12 +196,12 @@ app.title("Proyecto de Seguridad")
 title = Label(encode_frame, text='Encriptar', font=("Times New Roman", 24))
 title.grid(row=0, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
-on_click_button = Button(encode_frame, text='Eligir imagen', bg='white', fg='black', command=load_image_encode)
+on_click_button = Button(encode_frame, text='Elegir imagen', bg='white', fg='black', command=load_image_encode)
 on_click_button.grid(row=1, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
-file_on_click_button = Button(encode_frame, text='Eligir archivo', bg='white', fg='black', command=load_file_to_encode)
+file_on_click_button = Button(encode_frame, text='Elegir archivo', bg='white', fg='black', command=load_file_to_encode)
 file_on_click_button.grid(row=3, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
-encode_button = Button(encode_frame, text="Encode", bg='white', fg='black', command=encode)
+encode_button = Button(encode_frame, text="Confirmar", bg='white', fg='black', command=encode)
 encode_button.grid(row=5, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
 # ---------------------------------------------------------------------------------------------------------------
@@ -211,10 +211,10 @@ encode_button.grid(row=5, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 d_title = Label(decode_frame, text='Desencriptar', font=("Times New Roman", 24))
 d_title.grid(row=0, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
-d_on_click_button = Button(decode_frame, text='Eligir imagen', bg='white', fg='black', command=load_image_decode)
+d_on_click_button = Button(decode_frame, text='Elegir imagen', bg='white', fg='black', command=load_image_decode)
 d_on_click_button.grid(row=1, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
-d_button = Button(decode_frame, text="Decode", bg='white', fg='black', command=decode)
+d_button = Button(decode_frame, text="Confirmar", bg='white', fg='black', command=decode)
 d_button.grid(row=3, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 # ---------------------------------------------------------------------------------------------------------------
 
