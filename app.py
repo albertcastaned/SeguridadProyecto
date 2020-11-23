@@ -84,7 +84,7 @@ def encode():
     bits_message += ''.join([format(ord(i), "08b") for i in delimiter])
     if save_file_name:
         # Get file name and extension bits
-        bits_message += ''.join([format(ord(i), "08b") for i in m_file.name])
+        bits_message += ''.join([format(ord(i), "08b") for i in os.path.basename(str(m_file.name))])
         # Get file name and extension delimiter bits
         bits_message += ''.join([format(ord(i), "08b") for i in file_name_delimiter])
 
