@@ -2,14 +2,18 @@ from tkinter import *
 from tkinter import filedialog, scrolledtext
 from PIL import Image, ImageTk
 import numpy as np
+import os
 
 
+global path_file_encode
 global path_to_image_encode
 global path_to_image_decode
 
 padding = 15
 preview_image_display_size = 300, 300
+file_name_delimiter = "$f1n0"
 delimiter = "$t3g0"
+save_file_name = True
 
 def load_image_encode():
     global path_to_image_encode
@@ -27,6 +31,13 @@ def load_image_encode():
     image = Label(encode_frame, image=render)
     image.image = render
     image.grid(row=2, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
+
+def load_file_to_encode():
+    global path_file_encode
+    path_file_encode = filedialog.askopenfilename()
+    path_file_label = Label(encode_frame, text=path_file_encode, font=("Times New Roman", 16))
+    path_file_label.grid(row=4, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
+    
 
 def load_image_decode():
     global path_to_image_decode
@@ -46,6 +57,7 @@ def load_image_decode():
     image.grid(row=2, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
 def encode():
+    
     global path_to_image_encode
     image = Image.open(path_to_image_encode, 'r')
     width, height = image.size
@@ -59,21 +71,31 @@ def encode():
         m = 1
     else:
         print("ERROR: Tipo de imagen incompatible.")
-        message_label = Label(encode_frame, text="ERROR: Tipo de imagen incompatible.", bg='SpringGreen2', font=("Times New Roman", 16))
+        message_label = Label(encode_frame, text="ERROR: Tipo de imagen incompatible.", bg='IndianRed1', font=("Times New Roman", 16))
         message_label.grid(row=4, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
         return
-    
     total_pixels = image_matrix.size//bytes_per_pixel
+    m_file = open(path_file_encode, "rb")
+    data = m_file.read()
+    m_file.close()
+    # Get data bits
+    bits_message = ''.join(format(byte, "08b") for byte in data)
+    # Get data delimiter bits
+    bits_message += ''.join([format(ord(i), "08b") for i in delimiter])
+    if save_file_name:
+        # Get file name and extension bits
+        bits_message += ''.join([format(ord(i), "08b") for i in m_file.name])
+        # Get file name and extension delimiter bits
+        bits_message += ''.join([format(ord(i), "08b") for i in file_name_delimiter])
 
-    secret_message = text.get(1.0, "end-1c")
-    secret_message += delimiter
-
-    bits_message = ''.join([format(ord(i), "08b") for i in secret_message])
     required_pixels = len(bits_message)
 
     if required_pixels > total_pixels:
-        print("ERROR: Tamaño insuficiente para el mensaje. Debe utilizar una imagen con mas pixeles, o acortar el mensaje")
-        message_label = Label(encode_frame, text="ERROR: Tamaño insuficiente para el mensaje. Debe utilizar una imagen con mas pixeles, o acortar el mensaje", bg='SpringGreen2', font=("Times New Roman", 16))
+        error_message = "ERROR: Tamaño insuficiente para el archivo. Debe utilizar una imagen con " \
+            + str(required_pixels) + " pixeles o mas. Su imagen tiene " \
+                + str(total_pixels) + " pixeles."
+        print(error_message)
+        message_label = Label(encode_frame, text=error_message, bg='IndianRed1', font=("Times New Roman", 16))
         message_label.grid(row=4, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
         return
     else:
@@ -92,7 +114,6 @@ def encode():
     message_label = Label(encode_frame, text="Imagen codificada exitosamente.", bg='SpringGreen2', font=("Times New Roman", 16))
     message_label.grid(row=4, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
-
 def decode():
     global path_to_image_decode
     image = Image.open(path_to_image_decode, 'r')
@@ -105,7 +126,7 @@ def decode():
         bytes_per_pixel = 4
         m = 1
     else:
-        d_message_label = Label(decode_frame, text="ERROR: Tipo de imagen incompatible.", bg='SpringGreen2', font=("Times New Roman", 16))
+        d_message_label = Label(decode_frame, text="ERROR: Tipo de imagen incompatible.", bg='IndianRed1', font=("Times New Roman", 16))
         d_message_label.grid(row=4, column=1, sticky=N+E+S+W, padx=padding, pady=padding)
         return
     
@@ -119,26 +140,47 @@ def decode():
     hidden_bits = [hidden_bits[i:i+8] for i in range(0, len(hidden_bits), 8)]
 
     message = ""
+    filename = ""
+    message_found_index = 0
 
-    for i in range(len(hidden_bits)):
+    # Look for message delimiter
+    for message_index in range(len(hidden_bits)):
         if message[-5:] == delimiter:
+            message_found_index = message_index
             break
         else:
-            message += chr(int(hidden_bits[i], 2))
+            message += chr(int(hidden_bits[message_index], 2))
+
+    if save_file_name:
+        # Look for filename delimiter
+        for filename_index in range(len(hidden_bits)):
+            if filename[-5:] == file_name_delimiter:
+                break
+            else:
+                filename += chr(int(hidden_bits[filename_index + message_found_index], 2))
+    
     if delimiter in message:
         result = message[:-5]
     else:
         result = "No se encontro ningun mensaje secreto"
-    d_text.config(state=NORMAL)
-    d_text.delete(1.0, END)
-    d_text.insert(1.0, result)
-    d_text.config(state=DISABLED)
-
-    print(result)
+        d_message_label = Label(decode_frame, text=result, bg='IndianRed1', font=("Times New Roman", 16))
+        d_message_label.grid(row=4, column=1, sticky=N+E+S+W, padx=padding, pady=padding)
+    if save_file_name:
+        if file_name_delimiter in filename:
+            filename_result = filename[:-5]
+        else:
+            filename_result = "No se encontro el nombre del archivo"
+        
+    print("Imagen decodificada exitosamente.")
+    if save_file_name:
+        print(filename_result)
+        m_file = open(filename_result, "w", encoding='utf8')
+    else:
+        m_file = open("result", "w", encoding='utf8')
+    m_file.write(result)
+    m_file.close()
     d_message_label = Label(decode_frame, text="Imagen decodificada exitosamente.", bg='SpringGreen2', font=("Times New Roman", 16))
     d_message_label.grid(row=4, column=1, sticky=N+E+S+W, padx=padding, pady=padding)
-
-
 
 app = Tk()
 app.state('zoomed')
@@ -156,12 +198,11 @@ title.grid(row=0, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
 on_click_button = Button(encode_frame, text='Eligir imagen', bg='white', fg='black', command=load_image_encode)
 on_click_button.grid(row=1, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
-
-text = Text(encode_frame, wrap=WORD)
-text.grid(row=2, column=1, sticky=E+W, padx=padding, pady=padding)
+file_on_click_button = Button(encode_frame, text='Eligir archivo', bg='white', fg='black', command=load_file_to_encode)
+file_on_click_button.grid(row=3, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
 encode_button = Button(encode_frame, text="Encode", bg='white', fg='black', command=encode)
-encode_button.grid(row=3, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
+encode_button.grid(row=5, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
 # ---------------------------------------------------------------------------------------------------------------
 
@@ -172,10 +213,6 @@ d_title.grid(row=0, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
 d_on_click_button = Button(decode_frame, text='Eligir imagen', bg='white', fg='black', command=load_image_decode)
 d_on_click_button.grid(row=1, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
-
-d_text = Text(decode_frame, wrap=WORD)
-d_text.grid(row=2, column=1, sticky=E+W, padx=padding, pady=padding)
-d_text.config(state=DISABLED)
 
 d_button = Button(decode_frame, text="Decode", bg='white', fg='black', command=decode)
 d_button.grid(row=3, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
