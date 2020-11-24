@@ -109,9 +109,9 @@ def encode():
     image_matrix = image_matrix.reshape(height, width, bytes_per_pixel)
     encoded_image = Image.fromarray(image_matrix.astype('uint8'), image.mode)
     encoded_image.save(image.filename + "-encrypted.png")
-    print("Imagen codificada exitosamente.")
+    print("Imagen cifrada exitosamente.")
 
-    message_label = Label(encode_frame, text="Imagen codificada exitosamente.", bg='SpringGreen2', font=("Times New Roman", 16))
+    message_label = Label(encode_frame, text="Imagen cifrada exitosamente.", bg='SpringGreen2', font=("Times New Roman", 16))
     message_label.grid(row=4, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
 def decode():
@@ -177,7 +177,7 @@ def decode():
             print(filename_result)
             return
     
-    print("Imagen decodificada exitosamente.")
+    print("Imagen descifrada exitosamente.")
     result_directory = os.getcwd() + "/results/"
     if not os.path.exists(os.path.dirname(result_directory)):
         try:
@@ -196,7 +196,7 @@ def decode():
         m_file = open(file_path, "w", encoding='utf8')
     m_file.write(result)
     m_file.close()
-    d_message_label = Label(decode_frame, text="Imagen decodificada exitosamente.", bg='SpringGreen2', font=("Times New Roman", 16))
+    d_message_label = Label(decode_frame, text="Imagen descifrada exitosamente.", bg='SpringGreen2', font=("Times New Roman", 16))
     d_message_label.grid(row=4, column=1, sticky=N+E+S+W, padx=padding, pady=padding)
 
 app = Tk()
@@ -210,7 +210,7 @@ app.title("Proyecto de Seguridad")
 
 # Encrypt --------------------------------------------------------------------------------------------------------
 
-title = Label(encode_frame, text='Encriptar', font=("Times New Roman", 24))
+title = Label(encode_frame, text='Cifrar', font=("Times New Roman", 24))
 title.grid(row=0, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
 on_click_button = Button(encode_frame, text='Elegir imagen', bg='white', fg='black', command=load_image_encode)
@@ -225,7 +225,7 @@ encode_button.grid(row=5, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
 # Decrypt --------------------------------------------------------------------------------------------------------
 
-d_title = Label(decode_frame, text='Desencriptar', font=("Times New Roman", 24))
+d_title = Label(decode_frame, text='Descifrar', font=("Times New Roman", 24))
 d_title.grid(row=0, column=0, sticky=N+E+S+W, padx=padding, pady=padding)
 
 d_on_click_button = Button(decode_frame, text='Elegir imagen', bg='white', fg='black', command=load_image_decode)
