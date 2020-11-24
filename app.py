@@ -165,12 +165,18 @@ def decode():
         result = "No se encontro ningun mensaje secreto"
         d_message_label = Label(decode_frame, text=result, bg='IndianRed1', font=("Times New Roman", 16))
         d_message_label.grid(row=4, column=1, sticky=N+E+S+W, padx=padding, pady=padding)
+        print(result)
+        return
     if save_file_name:
         if file_name_delimiter in filename:
             filename_result = filename[:-5]
         else:
             filename_result = "No se encontro el nombre del archivo"
-        
+            d_message_label = Label(decode_frame, text=result, bg='IndianRed1', font=("Times New Roman", 16))
+            d_message_label.grid(row=4, column=1, sticky=N+E+S+W, padx=padding, pady=padding)
+            print(filename_result)
+            return
+    
     print("Imagen decodificada exitosamente.")
     result_directory = os.getcwd() + "/results/"
     if not os.path.exists(os.path.dirname(result_directory)):
